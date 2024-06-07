@@ -18,16 +18,18 @@ def cart_view(request):
                                                          'indent': 4})
         products = []  # Список продуктов
         for product_id, quantity in data['products'].items():
-            product = ...  # 1. Получите информацию о продукте из DATABASE по его product_id. product будет словарём
+            product = DATABASE.get(product_id)  # 1. Получите информацию о продукте из DATABASE по его product_id. product будет словарём
             # 2. в словарь product под ключом "quantity" запишите текущее значение товара в корзине
+            product["quantity"] = quantity
             product["price_total"] = f"{quantity * product['price_after']:.2f}"  # добавление общей цены позиции с ограничением в 2 знака
             # 3. добавьте product в список products
+            products.append(product)
 
         return render(request, "store/cart.html", context={"products": products})
 
 def cart_add_view(request, id_product):
     if request.method == "GET":
-        result = add_to_cart(request)  # TODO Вызвать ответственную за это действие функцию и передать необходимые параметры
+        result = add_to_cart(id_product)  # TODO Вызвать ответственную за это действие функцию и передать необходимые параметры
         if result:
             return JsonResponse({"answer": "Продукт успешно добавлен в корзину"},
                                 json_dumps_params={'ensure_ascii': False})
@@ -39,7 +41,7 @@ def cart_add_view(request, id_product):
 
 def cart_del_view(request, id_product):
     if request.method == "GET":
-        result = remove_from_cart(request) # TODO Вызвать ответственную за это действие функцию и передать необходимые параметры
+        result = remove_from_cart(id_product) # TODO Вызвать ответственную за это действие функцию и передать необходимые параметры
         if result:
             return JsonResponse({"answer": "Продукт успешно удалён из корзины"},
                                 json_dumps_params={'ensure_ascii': False})

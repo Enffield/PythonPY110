@@ -92,12 +92,11 @@ def add_to_cart(id_product: str) -> bool:
     # ! cart["products"][id_product]
     # ! Далее уже сами решайте как и в какой последовательности дальше действовать.
 
-    if id_product in cart['product'] and id_product in DATABASE: # TODO Проверьте, а существует ли такой товар в корзине, если нет, то перед тем как его добавить - проверьте есть ли такой id_product товара в вашей базе данных DATABASE, чтобы уберечь себя от добавления несуществующего товара.
-        cart[id_product]['product'] += 1
-
-    elif id_product in cart['product'] and id_product not in DATABASE: # TODO Если товар существует, то увеличиваем его количество на 1
-        cart[id_product]['product'] = 1
-
+    if id_product in DATABASE:
+        if id_product in cart['products']: # TODO Проверьте, а существует ли такой товар в корзине, если нет, то перед тем как его добавить - проверьте есть ли такой id_product товара в вашей базе данных DATABASE, чтобы уберечь себя от добавления несуществующего товара.
+            cart['products'][id_product] += 1
+        else:
+            cart['products'][id_product] = 1
     else:
         return False
 
@@ -121,11 +120,10 @@ def remove_from_cart(id_product: str) -> bool:
 
     # С переменной cart функции remove_from_cart ситуация аналогичная, что с cart функции add_to_cart
 
-    if id_product not in cart['product']: # TODO Проверьте, а существует ли такой товар в корзине, если нет, то возвращаем False.
+    if id_product not in cart['products']: # TODO Проверьте, а существует ли такой товар в корзине, если нет, то возвращаем False.
         return False
-
     else:
-        cart['product'].pop[id_product] # TODO Если существует товар, то удаляем ключ 'id_product' у cart['products'].
+        cart['products'].pop(id_product)  # TODO Если существует товар, то удаляем ключ 'id_product' у cart['products'].
 
     with open('cart.json', 'w', encoding='utf-8') as file: # TODO Не забываем записать обновленные данные cart в 'cart.json'
         json.dump(cart, file)
