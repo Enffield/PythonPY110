@@ -17,14 +17,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from app_datetime.views import datetime_view
-from store.views import products_view, cart_view, cart_add_view, cart_del_view
+from store.views import products_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('data/', datetime_view),
     path('product/', products_view),
     path('', include('store.urls')),
-    path('cart/', cart_view),
-    path('cart/add/<str:id_product>', cart_add_view),
-    path('cart/del/<str:id_product>', cart_del_view),
 ]

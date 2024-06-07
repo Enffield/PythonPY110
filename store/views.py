@@ -2,7 +2,11 @@ from django.http import JsonResponse, HttpResponse, HttpResponseNotFound
 from .models import DATABASE
 from logic.services import filtering_category
 from logic.services import view_in_cart, add_to_cart, remove_from_cart
+from django.shortcuts import render
 
+def shop_view(request):
+    if request.method == "GET":
+        return render(request, 'shop.html')
 
 def cart_view(request):
     if request.method == "GET":
@@ -13,7 +17,7 @@ def cart_view(request):
 
 def cart_add_view(request, id_product):
     if request.method == "GET":
-        result = add_to_cart() # TODO Вызвать ответственную за это действие функцию и передать необходимые параметры
+        result = add_to_cart(request)  # TODO Вызвать ответственную за это действие функцию и передать необходимые параметры
         if result:
             return JsonResponse({"answer": "Продукт успешно добавлен в корзину"},
                                 json_dumps_params={'ensure_ascii': False})
@@ -25,7 +29,7 @@ def cart_add_view(request, id_product):
 
 def cart_del_view(request, id_product):
     if request.method == "GET":
-        result = remove_from_cart() # TODO Вызвать ответственную за это действие функцию и передать необходимые параметры
+        result = remove_from_cart(request) # TODO Вызвать ответственную за это действие функцию и передать необходимые параметры
         if result:
             return JsonResponse({"answer": "Продукт успешно удалён из корзины"},
                                 json_dumps_params={'ensure_ascii': False})
@@ -51,12 +55,12 @@ def products_view(request):
         # Обработка фильтрации из параметров запроса
         category_key = request.GET.get("category")  # Считали 'category'
         if ordering_key := request.GET.get("ordering"): # Если в параметрах есть 'ordering'
-            if request.GET.get("reverse") and request.GET.get("reverse").lower() == 'True': # Если в параметрах есть 'ordering' и 'reverse'=True
+            if request.GET.get("reverse").lower() == 'true': # Если в параметрах есть 'ordering' и 'reverse'=True
                 data = filtering_category(DATABASE, category_key, ordering_key, True) #  TODO Использовать filtering_category и провести фильтрацию с параметрами category, ordering, reverse=True
             else:  # Если не обнаружили в адресно строке ...&reverse=true , значит reverse=False
                 data = filtering_category(DATABASE, category_key, ordering_key) #  TODO Использовать filtering_category и провести фильтрацию с параметрами category, ordering, reverse=False
         else:
-            data = filtering_category(DATABASE, category_key) #  TODO Использовать filtering_category и провести фильтрацию с параметрами category
+            data = DATABASE.get(id_product) #  TODO Использовать filtering_category и провести фильтрацию с параметрами category
         # В этот раз добавляем параметр safe=False, для корректного отображения списка в JSON
         return JsonResponse(data, safe=False, json_dumps_params={'ensure_ascii': False,
                                                                  'indent': 4})
@@ -86,8 +90,8 @@ def products_view_1(request):
                 return HttpResponseNotFound("Данного продукта нет в базе данных")
         return JsonResponse(DATABASE, json_dumps_params={'ensure_ascii': False, 'indent': 4})
 
-def shop_view(request):
-    if request.method == "GET":
-        with open('store/shop.html', encoding="utf-8") as f:
-            data = f.read()
-        return HttpResponse(data)
+# def shop_view(request):
+#     if request.method == "GET":
+#         with open('store/shop.html', encoding="utf-8") as f:
+#             data = f.read()
+#         return HttpResponse(data)
